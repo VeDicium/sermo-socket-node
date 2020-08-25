@@ -175,9 +175,13 @@ export class SermoSocket {
     return this.request('DELETE', url, options);
   }
 
-  // Map EventEmitter 'on'
+  // Map EventEmitter 'on' & 'once'
   on (event: string, fn: (...args: any[]) => void) {
     return this.__emitter.on(event, fn);
+  }
+
+  once (event: string, fn: (...args: any[]) => void) {
+    return this.__emitter.once(event, fn);
   }
 
   // Getter & Setters
