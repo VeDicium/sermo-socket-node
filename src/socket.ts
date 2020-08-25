@@ -16,6 +16,7 @@ export const SermoSocketErrors = SimpleCustomErrors.createError('SermoSocketErro
 
 export interface SermoSocketOptions {
   socket: net.NetConnectOpts;
+  reconnect?: boolean;
   endByte?: number;
 }
 
@@ -67,6 +68,9 @@ export class SermoSocket {
 
   constructor (options: SermoSocketOptions) {
     this.options = options;
+
+    // Default reconnect is true
+    this.options.reconnect = (typeof this.options.reconnect === 'boolean' ? this.options.reconnect : true);
 
     // Default end byte is 0x0A
     this.options.endByte = (this.options.endByte || 0x0A);
@@ -218,8 +222,8 @@ export class SermoSocket {
       // Only trigger when state was connected first
       if (this.state === true) this.__emitter.emit('disconnect');
 
-      // Trigger reconnect if state changed to false
-      this.reconnect();
+      // Trigger reconnect if state changed to false (if not disabled)
+      if (this.options.reconnect !== false) this.reconnect();
 
       // Throw error on all pending requests
       Object.keys(this.__pendingRequest).forEach((requestId) => {
