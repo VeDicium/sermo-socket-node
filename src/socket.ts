@@ -155,6 +155,26 @@ export class SermoSocket {
     });
   }
 
+  async get (url: string, options?: RequestOptions): Promise<Response> {
+    return this.request('GET', url, options);
+  }
+
+  async post (url: string, options?: RequestOptions): Promise<Response> {
+    return this.request('POST', url, options);
+  }
+
+  async put (url: string, options?: RequestOptions): Promise<Response> {
+    return this.request('PUT', url, options);
+  }
+
+  async patch (url: string, options?: RequestOptions): Promise<Response> {
+    return this.request('PATCH', url, options);
+  }
+
+  async delete (url: string, options?: RequestOptions): Promise<Response> {
+    return this.request('DELETE', url, options);
+  }
+
   // Map EventEmitter 'on'
   on (event: string, fn: (...args: any[]) => void) {
     return this.__emitter.on(event, fn);
