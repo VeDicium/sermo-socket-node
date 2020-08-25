@@ -191,12 +191,22 @@ export class SermoSocket {
       return;
     }
 
-    // Trigger reconnect if state changed to false
+    // On connect
+    if (state === true) {
+      // Emit that socket is connected
+      this.__emitter.emit('connect');
+    }
+
     if (state === false) {
+      // Only trigger when state was connected first
+      if (this.state === true) this.__emitter.emit('disconnect');
+
+      // Trigger reconnect if state changed to false
       this.reconnect();
     }
 
     // State has changed
+    this.__emitter.emit('state-change', state, this.state);
     this.state = state;
   }
 
@@ -246,8 +256,9 @@ export class SermoSocket {
     });
   }
 
-  __onError (_err: Error): void {
+  __onError (err: Error): void {
     this.__onStateChange(false);
+    this.__emitter.emit('error', err);
   }
 
   __onEnd (): void {
