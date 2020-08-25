@@ -1,5 +1,18 @@
 import net from 'net';
 import EventEmitter from 'eventemitter3';
+import SimpleCustomErrors from 'simple-custom-errors';
+
+export const SermoSocketErrors = SimpleCustomErrors.createError('SermoSocketErrors', [
+  {
+    code: 'Timeout',
+    description: 'Request timed out',
+    params: ['requestId'],
+    http: {
+      statusCode: 408,
+    },
+    sentry: false,
+  },
+]);
 
 export interface SermoSocketOptions {
   socket: net.NetConnectOpts;
@@ -150,7 +163,7 @@ export class SermoSocket {
       this.socket?.write(buffer);
 
       // Create pending request
-      const timeout = setTimeout(() => reject({ type: 'timeout', requestId: request.requestId }), (options?.timeout || 5000));
+      const timeout = setTimeout(() => reject(new SermoSocketErrors('Timeout', { requestId: request.requestId })), (options?.timeout || 5000));
       this.__pendingRequest[request.requestId] = { resolve, reject, timeout, requestId: request.requestId };
     });
   }
@@ -207,6 +220,11 @@ export class SermoSocket {
 
       // Trigger reconnect if state changed to false
       this.reconnect();
+
+      // Throw error on all pending requests
+      Object.keys(this.__pendingRequest).forEach((requestId) => {
+        this.__pendingRequest[requestId].reject(new SermoSocketErrors('Timeout', { requestId }));
+      });
     }
 
     // State has changed

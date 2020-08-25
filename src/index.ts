@@ -1,4 +1,4 @@
-import SermoSocket, { SermoSocketOptions, Request, RequestMethod, RequestOptions, Response, ResponseType } from './socket';
+import SermoSocket, { SermoSocketOptions, Request, RequestMethod, RequestOptions, Response, ResponseType, SermoSocketErrors } from './socket';
 
 export class Sermo {
   static connect (options: SermoSocketOptions): SermoSocket {
@@ -9,6 +9,7 @@ export class Sermo {
 export {
   SermoSocket,
   SermoSocketOptions,
+  SermoSocketErrors,
 
   Request,
   RequestMethod,
