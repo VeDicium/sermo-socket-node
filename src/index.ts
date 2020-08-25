@@ -1,7 +1,7 @@
 import SermoSocket, { SermoSocketOptions, Request, RequestMethod, RequestOptions, Response, ResponseType } from './socket';
 
 export class Sermo {
-  static async connect (options: SermoSocketOptions): Promise<SermoSocket> {
+  static connect (options: SermoSocketOptions): SermoSocket {
     return new SermoSocket(options).connect();
   }
 }

@@ -75,7 +75,7 @@ export class SermoSocket {
     return this;
   }
 
-  async connect (): Promise<SermoSocket> {
+  connect (): SermoSocket {
     const socket = net.createConnection(this.options.socket);
     return this.init(socket);
   }
