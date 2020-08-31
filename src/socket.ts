@@ -214,8 +214,7 @@ export class SermoSocket {
 
     // On connect
     if (state === true) {
-      // Emit that socket is connected
-      this.__emitter.emit('connect');
+      // Nothing to do here (yet)
     }
 
     if (state === false) {
@@ -234,6 +233,11 @@ export class SermoSocket {
     // State has changed
     this.__emitter.emit('state-change', state, this.state);
     this.state = state;
+
+    // Emit connect after setting state, because else the offline error will cause problems
+    if (state === true) {
+      this.__emitter.emit('connect');
+    }
   }
 
   __onConnect (): void {
