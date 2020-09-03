@@ -60,6 +60,7 @@ export class SermoSocket {
 
   socket = null as null | net.Socket;
   state = null as null | boolean;
+  lastMessage = null as null | number;
 
   __reconnectTimeout = null as null | NodeJS.Timeout;
   __reconnectCount = 0;
@@ -110,6 +111,7 @@ export class SermoSocket {
 
     // Set state back to null
     this.state = null;
+    this.lastMessage = null;
 
     // Destroy connection with socket
     this.socket.destroy();
@@ -207,6 +209,10 @@ export class SermoSocket {
   }
 
   // Private functions
+  __onMessage (): void {
+    this.lastMessage = new Date().getTime();
+  }
+
   __onStateChange (state: boolean): void {
     if (this.state === state) {
       return;
@@ -243,6 +249,7 @@ export class SermoSocket {
   __onConnect (): void {
     this.__reconnectCount = 0;
     this.__onStateChange(true);
+    this.__onMessage();
   }
 
   __onData (data: Buffer): void {
@@ -265,6 +272,9 @@ export class SermoSocket {
       } catch (e) {
         return;
       }
+
+      // Update last message
+      this.__onMessage();
 
       // Push request
       if (message.type.toUpperCase() === 'PUSH') {
