@@ -66,6 +66,7 @@ export class SermoSocket {
   __reconnectCount = 0;
   __pendingRequest = {} as Record<string, PendingRequest>;
   __emitter = new EventEmitter();
+  __buffer = [] as Array<number>;
 
   constructor (options: SermoSocketOptions) {
     this.options = options;
@@ -83,6 +84,7 @@ export class SermoSocket {
 
     // Set socket
     this.socket = socket;
+    this.__buffer = [];
 
     // Listeners
     this.socket.on('connect', this.__onConnect.bind(this));
@@ -112,6 +114,7 @@ export class SermoSocket {
     // Set state back to null
     this.state = null;
     this.lastMessage = null;
+    this.__buffer = [];
 
     // Destroy connection with socket
     this.socket.destroy();
@@ -255,13 +258,12 @@ export class SermoSocket {
   __onData (data: Buffer): void {
     // Split data by end byte
     const messages = [];
-    let buff = [];
     for (let i = 0; i < data.length; i++) {
       if (data[i] !== this.options.endByte) {
-        buff.push(data[i]);
+        this.__buffer.push(data[i]);
       } else {
-        messages.push(Buffer.from(buff));
-        buff = [];
+        messages.push(Buffer.from(this.__buffer));
+        this.__buffer = [];
       }
     }
 
