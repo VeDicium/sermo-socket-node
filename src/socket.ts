@@ -12,6 +12,12 @@ export const SermoSocketErrors = SimpleCustomErrors.createError('SermoSocketErro
     },
     sentry: false,
   },
+  {
+    code: 'RequestError',
+    description: '{{message}}',
+    params: ['url', 'code', 'data', 'message'],
+    sentry: false,
+  }
 ]);
 
 export interface SermoSocketOptions {
@@ -290,7 +296,12 @@ export class SermoSocket {
         if (message.code === 200) {
           this.__pendingRequest[message.requestId].resolve(message);
         } else {
-          this.__pendingRequest[message.requestId].reject(message);
+          this.__pendingRequest[message.requestId].reject(new SermoSocketErrors('RequestError', {
+            url: message.url,
+            code: message.code,
+            data: message.data,
+            message: message.data.error
+          }));
         }
 
         delete this.__pendingRequest[message.requestId];
