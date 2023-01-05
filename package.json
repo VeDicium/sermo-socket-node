@@ -1,6 +1,6 @@
 {
   "name": "@vedicium/sermo-socket",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,6 +38,6 @@
     "eventemitter3": "^4.0.7"
   },
   "versionist": {
-    "publishedAt": "2023-01-05T10:23:28.830Z"
+    "publishedAt": "2023-01-05T10:38:05.834Z"
   }
 }
