@@ -204,11 +204,11 @@ export class SermoSocket {
    * @param options SermoRequestOptions
    * @returns SermoResponse
    */
-  async get<T>(
+  async get<T = any, R = SermoResponse<T>>(
     url: string,
     options?: SermoRequestOptions,
-  ): Promise<SermoResponse<T>> {
-    return this.request<T>('GET', url, options);
+  ): Promise<R> {
+    return this.request<T, R>('GET', url, options);
   }
 
   /**
@@ -219,12 +219,16 @@ export class SermoSocket {
    * @param options SermoRequestOptions
    * @returns SermoResponse
    */
-  async post<T>(
+  async post<T = any, R = SermoResponse<T>>(
     url: string,
     data?: any,
     options?: SermoRequestOptions,
-  ): Promise<SermoResponse<T>> {
-    return this.request<T>('POST', url, Object.assign({ body: data }, options));
+  ): Promise<R> {
+    return this.request<T, R>(
+      'POST',
+      url,
+      Object.assign({ body: data }, options),
+    );
   }
 
   /**
@@ -235,12 +239,16 @@ export class SermoSocket {
    * @param options SermoRequestOptions
    * @returns SermoResponse
    */
-  async put<T>(
+  async put<T = any, R = SermoResponse<T>>(
     url: string,
     data?: any,
     options?: SermoRequestOptions,
-  ): Promise<SermoResponse<T>> {
-    return this.request<T>('PUT', url, Object.assign({ body: data }, options));
+  ): Promise<R> {
+    return this.request<T, R>(
+      'PUT',
+      url,
+      Object.assign({ body: data }, options),
+    );
   }
 
   /**
@@ -251,12 +259,16 @@ export class SermoSocket {
    * @param options SermoRequestOptions
    * @returns SermoResponse
    */
-  async patch<T>(
+  async patch<T = any, R = SermoResponse<T>>(
     url: string,
     data?: any,
     options?: SermoRequestOptions,
-  ): Promise<SermoResponse<T>> {
-    return this.request('PATCH', url, Object.assign({ body: data }, options));
+  ): Promise<R> {
+    return this.request<T, R>(
+      'PATCH',
+      url,
+      Object.assign({ body: data }, options),
+    );
   }
 
   /**
@@ -266,11 +278,11 @@ export class SermoSocket {
    * @param options  SermoRequestOptions
    * @returns SermoResponse
    */
-  async delete<T>(
+  async delete<T = any, R = SermoResponse<T>>(
     url: string,
     options?: SermoRequestOptions,
-  ): Promise<SermoResponse<T>> {
-    return this.request('DELETE', url, options);
+  ): Promise<R> {
+    return this.request<T, R>('DELETE', url, options);
   }
 
   // Map EventEmitter 'on' & 'once'
