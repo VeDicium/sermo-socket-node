@@ -408,7 +408,7 @@ export class SermoSocket {
         const request = this.pendingRequest.get(message.requestId);
 
         clearTimeout(request.timeout);
-        if (message.code >= 200 || message.code < 300) {
+        if (message.code >= 200 && message.code < 300) {
           request.resolve(message);
         } else {
           request.reject(
