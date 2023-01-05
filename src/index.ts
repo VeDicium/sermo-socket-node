@@ -1,22 +1,3 @@
-import SermoSocket, { SermoSocketOptions, Request, RequestMethod, RequestOptions, Response, ResponseType, SermoSocketErrors } from './socket';
+export * from './interfaces';
 
-export class Sermo {
-  static connect (options: SermoSocketOptions): SermoSocket {
-    return new SermoSocket(options).connect();
-  }
-}
-
-export {
-  SermoSocket,
-  SermoSocketOptions,
-  SermoSocketErrors,
-
-  Request,
-  RequestMethod,
-  RequestOptions,
-
-  Response,
-  ResponseType
-}
-
-export default Sermo;
+export * from './sermo-socket';
