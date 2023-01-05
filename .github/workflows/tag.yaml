@@ -18,7 +18,17 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: npm run build
-      - run: npm publish --access public
+
+      # Publish it to NPM.js first
+      - name: Publish to NPM.js
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Then, publish it also to GitHub
+      - name: Set GitHub @vedicium package registry
+        run: npm set //npm.pkg.github.com/:_authToken ${{ secrets.GH_NPM_TOKEN }}
+
+      - name: Publish to GitHub Registry
+        run: npm publish --access public --ignore-scripts --@vedicium:registry='https://npm.pkg.github.com'
 
