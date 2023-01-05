@@ -7,7 +7,6 @@
   "scripts": {
     "prebuild": "npm run lint:build && rimraf dist",
     "build": "tsc -p tsconfig.build.json",
-    "prepare": "npm run build",
     "format": "prettier --write \"/src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "npm run lint:build --fix",
     "lint:build": "eslint \"{src,apps,libs,test}/**/*.ts\"",
