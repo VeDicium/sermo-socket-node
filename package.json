@@ -1,6 +1,6 @@
 {
   "name": "sermo-socket",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -37,5 +37,8 @@
   },
   "dependencies": {
     "eventemitter3": "^4.0.7"
+  },
+  "versionist": {
+    "publishedAt": "2023-01-05T09:56:17.346Z"
   }
 }
