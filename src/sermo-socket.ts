@@ -11,6 +11,7 @@ import {
   SermoSocketError,
   SermoSocketTimeout,
   SermoSocketRequestError,
+  SermoEvents,
 } from './interfaces';
 
 export class SermoSocket {
@@ -42,7 +43,7 @@ export class SermoSocket {
   private reconnectTimeout = undefined as NodeJS.Timeout | undefined;
   private reconnectCount = 0;
   private pendingRequest = new Map<string, SermoPendingRequest>();
-  private emitter = new EventEmitter();
+  private emitter = new EventEmitter<SermoEvents>();
   private buffer: Array<number> = [];
 
   constructor(options: SermoSocketOptions) {
@@ -285,12 +286,29 @@ export class SermoSocket {
     return this.request<T, R>('DELETE', url, options);
   }
 
-  // Map EventEmitter 'on' & 'once'
-  on(event: string, fn: (...args: any[]) => void) {
+  /**
+   * Add a listener for a given event.
+   *
+   * @param event SermoEvent
+   * @param fn Callback
+   */
+  on<T extends EventEmitter.EventNames<SermoEvents>>(
+    event: T,
+    fn: EventEmitter.EventListener<SermoEvents, T>,
+  ) {
     return this.emitter.on(event, fn);
   }
 
-  once(event: string, fn: (...args: any[]) => void) {
+  /**
+   * Add a one-time listener for a given event.
+   *
+   * @param event SermoEvent
+   * @param fn Callback
+   */
+  once<T extends EventEmitter.EventNames<SermoEvents>>(
+    event: T,
+    fn: EventEmitter.EventListener<SermoEvents, T>,
+  ) {
     return this.emitter.once(event, fn);
   }
 
@@ -397,7 +415,6 @@ export class SermoSocket {
       // Push request
       if (message.type.toUpperCase() === 'PUSH') {
         this.emitter.emit('push', message);
-        this.emitter.emit(message.url, message);
       }
 
       // Response on request

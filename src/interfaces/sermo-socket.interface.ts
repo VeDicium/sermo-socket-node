@@ -83,3 +83,37 @@ export interface SermoResponse<T = any> {
   data?: T;
   requestId: string;
 }
+
+export type SermoEvents = {
+  /**
+   * Triggered when the Socket state has changed.
+   *
+   * @param state SermoSocketState
+   * @param oldState SermoSocketState
+   */
+  'state-change': (state: SermoSocketState, oldState: SermoSocketState) => void;
+
+  /**
+   * Triggered when a push message is received.
+   *
+   * @param message Message
+   */
+  push: <T = any, R = SermoResponse<T>>(message: R) => void;
+
+  /**
+   * Triggered when Socket is connected succesfully.
+   */
+  connect: () => void;
+
+  /**
+   * Triggered when Socket has disconnected.
+   */
+  disconnect: () => void;
+
+  /**
+   * Triggered on a Socket error.
+   *
+   * @param err Error
+   */
+  error: (err?: any) => void;
+};
