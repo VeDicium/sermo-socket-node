@@ -382,7 +382,11 @@ export class SermoSocket {
    * Triggered when the Socket connected.
    */
   private onConnect(): void {
+    // Clear reconnection state.
     this.reconnectCount = 0;
+    clearTimeout(this.reconnectTimeout);
+
+    // Trigger listeners
     this.onStateChange(SermoSocketState.CONNECTED);
     this.onMessage();
   }
