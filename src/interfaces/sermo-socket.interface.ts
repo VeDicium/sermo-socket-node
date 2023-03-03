@@ -67,6 +67,7 @@ export interface SermoRequest {
 }
 
 export interface SermoPendingRequest<T = any, R = SermoResponse<T>> {
+  request: SermoRequest;
   timeout: NodeJS.Timeout;
   requestId: string;
 

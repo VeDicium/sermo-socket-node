@@ -181,12 +181,12 @@ export class SermoSocket {
       this.socket?.write(buffer);
 
       // Create pending request
-      const timeout = setTimeout(
-        () => reject(new SermoSocketTimeout(request.requestId)),
-        options?.timeout || 5000,
-      );
+      const timeout = setTimeout(() => {
+        reject(new SermoSocketTimeout(request));
+      }, options?.timeout || 5000);
 
       this.pendingRequest.set(request.requestId, {
+        request,
         resolve: resolve as (
           value: SermoResponse<any> | PromiseLike<SermoResponse<any>>,
         ) => void,
@@ -360,8 +360,9 @@ export class SermoSocket {
       if (this.options.reconnect !== false) this.reconnect();
 
       // Throw error on all pending requests
-      this.pendingRequest.forEach((request, requestId) => {
-        request.reject(new SermoSocketTimeout(requestId));
+      this.pendingRequest.forEach((request) => {
+        clearTimeout(request.timeout);
+        request.reject(new SermoSocketTimeout(request.request));
       });
     }
 
