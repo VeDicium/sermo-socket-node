@@ -346,6 +346,9 @@ export class SermoSocket {
       return;
     }
 
+    // Save old state for future reference.
+    const oldState = this.state;
+
     // On connect
     if (state === SermoSocketState.CONNECTED) {
       // Nothing to do here (yet)
@@ -356,9 +359,6 @@ export class SermoSocket {
       if (this.state === SermoSocketState.CONNECTED) {
         this.emitter.emit('disconnect');
       }
-
-      // Trigger reconnect if state changed to false (if not disabled)
-      if (this.options.reconnect !== false) this.reconnect();
 
       // Throw error on all pending requests
       this.pendingRequest.forEach((request, requestId) => {
@@ -375,6 +375,14 @@ export class SermoSocket {
     // Emit connect after setting state, because else the offline error will cause problems
     if (state === SermoSocketState.CONNECTED) {
       this.emitter.emit('connect');
+    }
+
+    // Emit connect after setting state, because else the 'disconnect' will trigger before the state has changed.
+    if (
+      state === SermoSocketState.DISCONNECTED &&
+      oldState === SermoSocketState.CONNECTED
+    ) {
+      this.emitter.emit('disconnect');
     }
   }
 
