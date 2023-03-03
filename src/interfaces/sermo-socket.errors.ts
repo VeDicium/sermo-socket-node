@@ -1,3 +1,5 @@
+import { SermoRequest } from './sermo-socket.interface';
+
 /**
  * Sermo Socket error
  */
@@ -30,10 +32,16 @@ export class SermoSocketTimeout extends SermoSocketError {
    */
   public requestId: string | undefined = undefined;
 
-  constructor(requestId?: string) {
+  /**
+   * Sermo Request config.
+   */
+  public config: SermoRequest;
+
+  constructor(request: SermoRequest) {
     super('Request timed out');
 
     this.name = SermoSocketTimeout.name;
-    this.requestId = requestId;
+    this.config = request;
+    this.requestId = request.requestId;
   }
 }

@@ -107,7 +107,7 @@ export class SermoSocket {
     this.socket.off('end', this.onEnd.bind(this));
 
     // Set state back to null
-    this.state = SermoSocketState.DISCONNECTED;
+    this.state = SermoSocketState.INITIALIZING;
     this.lastMessage = undefined;
     this.buffer = [];
 
@@ -128,11 +128,37 @@ export class SermoSocket {
 
     // Retry connection
     let timeout = 100;
-    if (this.reconnectCount > 200) timeout = 10000;
-    else if (this.reconnectCount > 150) timeout = 5000;
-    else if (this.reconnectCount > 100) timeout = 2000;
-    else if (this.reconnectCount > 50) timeout = 1000;
-    else if (this.reconnectCount > 20) timeout = 500;
+    switch (true) {
+      case this.reconnectCount > 200: {
+        timeout = 10000;
+        break;
+      }
+
+      case this.reconnectCount > 150: {
+        timeout = 5000;
+        break;
+      }
+
+      case this.reconnectCount > 100: {
+        timeout = 2000;
+        break;
+      }
+
+      case this.reconnectCount > 50: {
+        timeout = 1000;
+        break;
+      }
+
+      case this.reconnectCount > 20: {
+        timeout = 500;
+        break;
+      }
+
+      default: {
+        timeout = 100;
+        break;
+      }
+    }
 
     this.reconnectTimeout = setTimeout(() => {
       // Clear timeout
@@ -181,12 +207,13 @@ export class SermoSocket {
       this.socket?.write(buffer);
 
       // Create pending request
-      const timeout = setTimeout(
-        () => reject(new SermoSocketTimeout(request.requestId)),
-        options?.timeout || 5000,
-      );
+      const timeout = setTimeout(() => {
+        reject(new SermoSocketTimeout(request));
+        this.pendingRequest.delete(request.requestId);
+      }, options?.timeout || 5000);
 
       this.pendingRequest.set(request.requestId, {
+        request,
         resolve: resolve as (
           value: SermoResponse<any> | PromiseLike<SermoResponse<any>>,
         ) => void,
@@ -345,23 +372,25 @@ export class SermoSocket {
       return;
     }
 
+    // Save old state for future reference.
+    const oldState = this.state;
+
     // On connect
     if (state === SermoSocketState.CONNECTED) {
       // Nothing to do here (yet)
     }
 
     if (state === SermoSocketState.DISCONNECTED) {
-      // Only trigger when state was connected first
-      if (this.state === SermoSocketState.CONNECTED) {
-        this.emitter.emit('disconnect');
-      }
-
       // Trigger reconnect if state changed to false (if not disabled)
-      if (this.options.reconnect !== false) this.reconnect();
+      if (this.options.reconnect !== false) {
+        this.reconnect();
+      }
 
       // Throw error on all pending requests
       this.pendingRequest.forEach((request, requestId) => {
-        request.reject(new SermoSocketTimeout(requestId));
+        clearTimeout(request.timeout);
+        request.reject(new SermoSocketTimeout(request.request));
+        this.pendingRequest.delete(requestId);
       });
     }
 
@@ -373,13 +402,25 @@ export class SermoSocket {
     if (state === SermoSocketState.CONNECTED) {
       this.emitter.emit('connect');
     }
+
+    // Emit connect after setting state, because else the 'disconnect' will trigger before the state has changed.
+    if (
+      state === SermoSocketState.DISCONNECTED &&
+      oldState === SermoSocketState.CONNECTED
+    ) {
+      this.emitter.emit('disconnect');
+    }
   }
 
   /**
    * Triggered when the Socket connected.
    */
   private onConnect(): void {
+    // Clear reconnection state.
     this.reconnectCount = 0;
+    clearTimeout(this.reconnectTimeout);
+
+    // Trigger listeners
     this.onStateChange(SermoSocketState.CONNECTED);
     this.onMessage();
   }
