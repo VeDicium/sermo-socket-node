@@ -183,6 +183,7 @@ export class SermoSocket {
       // Create pending request
       const timeout = setTimeout(() => {
         reject(new SermoSocketTimeout(request));
+        this.pendingRequest.delete(request.requestId);
       }, options?.timeout || 5000);
 
       this.pendingRequest.set(request.requestId, {
@@ -360,9 +361,10 @@ export class SermoSocket {
       if (this.options.reconnect !== false) this.reconnect();
 
       // Throw error on all pending requests
-      this.pendingRequest.forEach((request) => {
+      this.pendingRequest.forEach((request, requestId) => {
         clearTimeout(request.timeout);
         request.reject(new SermoSocketTimeout(request.request));
+        this.pendingRequest.delete(requestId);
       });
     }
 
